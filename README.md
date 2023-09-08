@@ -64,3 +64,24 @@ Checker Framework from running at all.  By running the Checker Framework first,
 it has a chance to register its callback before Lombok ends javac's annotation
 processing.  The callback will then run after typechecking, once Lombok has
 finished its rewriting work.
+
+## A bug in javac revealed by Lombok's `ClaimingProcessor`
+
+There is a second issue related to [a bug in javac (JDK-8312460)](https://bugs.openjdk.org/browse/JDK-8312460),
+although the primary problem is the fact that Lombok's `process` method returns
+true in some cases (see above).
+
+Lombok includes a second annotation processor called `ClaimingProcessor` that
+(1) advertises interest in only the `lombok.*` annotations and (2) returns true
+in its `process` method (but does nothing else).  This annotation processor is
+an ideal, well-formed processor that does not inherit any of the quirks of
+`@SupportedAnnotationTypes("*")` processors.
+
+Due to JDK-8312460, even if the Lombok team patched their `process` method to
+always return false, `ClaimingProcessor` would still prevent the Checker
+Framework from running.  See the JDK-8312460 description linked above for more
+information.
+
+Unfortunately the ticket was closed as "won't fix", although I suspect that the
+javac developers are very busy and did not fully understand this
+entirely-too-subtle issue.
