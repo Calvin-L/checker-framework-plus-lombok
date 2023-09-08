@@ -22,7 +22,7 @@ invocation of `javac` without all of Maven's machinery.
 
 ## Why the Checker Framework must be listed first
 
-**Background: annotation processing.**
+#### Background: annotation processing
 Javac runs annotation processors before typechecking.  Each processor
 advertises a set of class-level annotations that it is interested in using the
 `@SupportedAnnotationTypes` annotation or by overriding
@@ -37,12 +37,12 @@ two processors with `@SupportedAnnotationTypes("*")` and the first of them
 returns `true` from its `process` method, then the second is not guaranteed to
 run](https://bugs.openjdk.org/browse/JDK-8312460?focusedCommentId=14597634&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-14597634).
 
-**Background: how Lombok processes annotations**
+#### Background: how Lombok processes annotations
 Lombok's annotation processor [adversises interest in all annotations](https://github.com/projectlombok/lombok/blob/000ce6d19a3d4a7d8c88ffa51e47ffda2a3b2c79/src/core/lombok/core/AnnotationProcessor.java#L52).
 Furthermore, [its `process` method returns true when all the annotations on the
 class are Lombok annotations and there is at least one of them](https://github.com/projectlombok/lombok/blob/000ce6d19a3d4a7d8c88ffa51e47ffda2a3b2c79/src/core/lombok/core/AnnotationProcessor.java#L257C32-L257C32).
 
-**Background: how the Checker Framework processes annotations**
+#### Background: how the Checker Framework processes annotations
 The Checker Framework annotation processors [advertise interest in all
 annotations](https://github.com/typetools/checker-framework/blob/f2a190b914ab369037a156b630c55d4bed26a64f/framework/src/main/java/org/checkerframework/framework/source/SourceChecker.java#L1938).
 Their [`process` methods always return false](https://github.com/typetools/checker-framework/blob/f2a190b914ab369037a156b630c55d4bed26a64f/javacutil/src/main/java/org/checkerframework/javacutil/AbstractTypeProcessor.java#L114).
@@ -50,7 +50,7 @@ However, because javac runs annotation processors before typechecking, their
 process methods do not actually run the respective checker.  Instead, they
 [register a callback to be invoked later, after typechecking has completed](https://github.com/typetools/checker-framework/blob/f2a190b914ab369037a156b630c55d4bed26a64f/javacutil/src/main/java/org/checkerframework/javacutil/AbstractTypeProcessor.java#L96).
 
-**Summing up**
+#### Summing up
 The unfortunate combination of background facts leads to incorrect behavior for
 classes that have class-level Lombok annotations and no other annotations, e.g.
 ```
